@@ -1,0 +1,31 @@
+total RAM   : 508876 MB
+free RAM   : 338783 MB
+PID:NOMBRE_PROCESO:PADRE:ESTADO
+1:systemd:0:1:204800
+402:systemd-journal:1:1:24576
+432:systemd-udevd:1:1:65536
+573:multipathd:1:1:24576
+607:systemd-timesyn:1:1:12288
+648:systemd-network:1:1:233472
+664:systemd-resolve:1:1:36864
+678:accounts-daemon:1:1:40960
+681:cron:1:1:12288
+682:dbus-daemon:1:1:36864
+690:networkd-dispat:1:1:143360
+695:rsyslogd:1:1:86016
+697:snapd:1:1:12288
+703:systemd-logind:1:1:45056
+709:atd:1:1:8192
+722:agetty:1:1:12288
+738:unattended-upgr:1:1:143360
+743:sshd:1:1:45056
+771:polkitd:1:1:28672
+896:sshd:743:1:45056
+913:systemd:1:1:204800
+914:(sd-pam):913:1:204800
+1029:sshd:896:1:45056
+1030:sftp-server:1029:1:16384
+1031:sshd:743:1:45056
+1106:sshd:1031:1:45056
+1107:bash:1106:1:184320
+12168:cat:1107:0:8192
