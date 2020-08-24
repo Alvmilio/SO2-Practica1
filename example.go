@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	//"os/exec"
+	"os/exec"
 	"strconv"
 	"strings"
 )
@@ -38,9 +38,9 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	switch r.Method {
 	case "GET":
-		file := r.URL.Query()["path"][0]
+		//file := r.URL.Query()["path"][0]
 		w.WriteHeader(http.StatusOK)
-		fileCnt := readFile(file)
+		fileCnt := readFile("/proc/practica1")
 		retObject := getRetObject(fileCnt)
 		fmt.Println("Printing retObj")
 		fmt.Println(retObject)
@@ -53,7 +53,8 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	case "POST":
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"message": "method not implemented"}`))
+		killProcess(r.URL.Query()["pid"][0])
+		w.Write([]byte(`{"message": "Ok"}`))
 	default:
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"message": "method not implemented"}`))
@@ -81,20 +82,32 @@ func readFile(path string) string {
 
 }
 
+func killProcess(pid string) {
+	//realPid, _ := strconv.Atoi(pid)
+	out, _ := exec.Command("kill", "-9", pid).Output()
+	fmt.Println("Kill output: " + strings.Trim(string(out), "\n"))
+
+}
+
 func getRetObject(fileString string) ApiResponse {
 	var retObj = ApiResponse{}
 	var procArray []Proc
-	for index, proc := range strings.Split(fileString, "\n") {
-		pieces := strings.Split(proc, ":")
-		if index <= 1 {
+	var procs = strings.Split(fileString, "\n")
 
+	for i := 0; i < len(procs)-1; i++ {
+		var proc = procs[i]
+		pieces := strings.Split(proc, ":")
+		fmt.Println(i)
+		if i <= 1 {
+			fmt.Println("entro 1")
 			if strings.Contains(pieces[0], "total") {
 				retObj.TotalRam = MemInfo{"Total Ram", pieces[1]}
 			} else {
 				retObj.FreeRam = MemInfo{"Free Ram", pieces[1]}
 			}
 		}
-		if index >= 3 {
+		if i >= 3 {
+			fmt.Println("entro 2")
 
 			//fmt.Print(index)
 			//fmt.Print(pieces)
@@ -102,10 +115,10 @@ func getRetObject(fileString string) ApiResponse {
 			rid, _ := strconv.Atoi(pieces[2])
 			state, _ := strconv.Atoi(pieces[3])
 			procObj := Proc{Id: id, Name: pieces[1], RID: rid, State: state}
-			//out, _ := exec.Command("id", "-nu", pieces[0]).Output()
-			//procObj.User = strings.Trim(string(out), "\n")
-			//out2, _ := exec.Command("ps", "-p", pieces[1], "-o", "%mem").Output()
-			//procObj.Mem = strings.TrimLeft(strings.Split(string(out2), "\n")[1], " ")
+			out, _ := exec.Command("ps", "-o", "user=", "-p", pieces[0]).Output()
+			procObj.User = strings.Trim(string(out), "\n")
+			out2, _ := exec.Command("ps", "-p", pieces[0], "-o", "%mem").Output()
+			procObj.Mem = strings.TrimLeft(strings.Split(string(out2), "\n")[1], " ")
 			fmt.Print(procObj)
 			procArray = append(procArray, procObj)
 		}
